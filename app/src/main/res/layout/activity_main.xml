@@ -1,0 +1,32 @@
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="4"
+    android:rowCount="4"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/kick_button"
+        android:text="Kick"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"/>
+
+    <Button
+        android:id="@+id/snare_button"
+        android:text="Snare"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"/>
+
+    <Button
+        android:id="@+id/hihat_button"
+        android:text="HiHat"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_columnWeight="1"
+        android:layout_rowWeight="1"/>
+</GridLayout>
