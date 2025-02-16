@@ -4,38 +4,42 @@ import android.media.SoundPool
 import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myapplication.firebase.fetchWavFiles
+import com.example.myapplication.firebase.downloadFile
+import com.example.myapplication.ui.showFileSelectionDialog
 
 class MainActivity : AppCompatActivity() {
     private lateinit var soundPool: SoundPool
-    private var kickSound = 0
-    private var snareSound = 0
-    private var hihatSound = 0
+    private var loadedSounds = mutableMapOf<String, Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         // Initialize SoundPool
-        soundPool = SoundPool.Builder()
-            .setMaxStreams(6) // Allows multiple sounds to play simultaneously
-            .build()
+        soundPool = SoundPool.Builder().setMaxStreams(6).build()
 
-        // Load sounds
-        kickSound = soundPool.load(assets.openFd("sounds/kick.wav"), 1)
-        snareSound = soundPool.load(assets.openFd("sounds/snare.wav"), 1)
-        hihatSound = soundPool.load(assets.openFd("sounds/hihat.wav"), 1)
+        val playButton = findViewById<Button>(R.id.play_button)
 
-        // Assign sounds to buttons
-        findViewById<Button>(R.id.kick_button).setOnClickListener {
-            soundPool.play(kickSound, 1f, 1f, 0, 0, 1f)
+        // Fetch available .wav files from Firebase Storage
+        fetchWavFiles { fileNames ->
+            if (fileNames.isNotEmpty()) {
+                showFileSelectionDialog(this, fileNames) { selectedFile ->
+                    downloadFile(this, selectedFile) { filePath ->
+                        if (filePath != null) {
+                            val soundId = soundPool.load(filePath, 1)
+                            loadedSounds[selectedFile] = soundId
+                        }
+                    }
+                }
+            }
         }
 
-        findViewById<Button>(R.id.snare_button).setOnClickListener {
-            soundPool.play(snareSound, 1f, 1f, 0, 0, 1f)
-        }
-
-        findViewById<Button>(R.id.hihat_button).setOnClickListener {
-            soundPool.play(hihatSound, 1f, 1f, 0, 0, 1f)
+        // Play first loaded sound when the button is clicked
+        playButton.setOnClickListener {
+            loadedSounds.values.firstOrNull()?.let { soundId ->
+                soundPool.play(soundId, 1f, 1f, 0, 0, 1f)
+            }
         }
     }
 
